@@ -14,6 +14,8 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+    Route::get('/apply', \App\Livewire\RecruitmentForm::class)->name('apply');
 });
 Route::get('/test-login', function() {
     $credentials = ['email' => 'admin@afl.gov.lr', 'password' => 'password123'];
