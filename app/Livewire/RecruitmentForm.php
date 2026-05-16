@@ -66,6 +66,14 @@ class RecruitmentForm extends Component
         'county_of_origin' => 'required|in:Bomi,Bong,Gbarpolu,Grand Bassa,Grand Cape Mount,Grand Gedeh,Grand Kru,Lofa,Margibi,Maryland,Montserrado,Nimba,Rivercess,River Gee,Sinoe',
     ];
 
+    protected $messages = [
+        'passport_photo.max' => 'The passport photo must not be larger than 2MB.',
+        'passport_photo.image' => 'The passport photo must be an image file (jpeg, png, jpg).',
+        'passport_photo.required' => 'Please upload a passport photo.',
+        'national_id.max' => 'The National ID file must not be larger than 2MB.',
+        'waec_certificate.max' => 'The WAEC certificate must not be larger than 2MB.',
+    ];
+
     // Step 2 validation rules
     public function step2Rules()
     {
@@ -81,9 +89,9 @@ class RecruitmentForm extends Component
     {
         return [
             'preferred_testing_center' => 'required|in:' . implode(',', $this->testing_centers),
-            'passport_photo' => 'required|image|max:2048', // 2MB max
-            'national_id' => 'required|file|max:2048|mimes:jpg,jpeg,png,pdf',
-            'waec_certificate' => 'required|file|max:2048|mimes:jpg,jpeg,png,pdf',
+            'passport_photo' => 'required|file|max:5120|mimes:jpg,jpeg,png',  // 5MB
+            'national_id' => 'required|file|max:5120|mimes:jpg,jpeg,png,pdf',
+            'waec_certificate' => 'required|file|max:5120|mimes:jpg,jpeg,png,pdf',
         ];
     }
 
@@ -97,19 +105,48 @@ class RecruitmentForm extends Component
     public function updatedPassportPhoto()
     {
         $this->validateOnly('passport_photo');
+
+        // Store temporarily
         $this->photo_preview = $this->passport_photo->temporaryUrl();
+
+        // Log for debugging
+        \Illuminate\Support\Facades\Log::info('File uploaded', [
+            'name' => $this->passport_photo->getClientOriginalName(),
+            'size' => $this->passport_photo->getSize(),
+            'mime' => $this->passport_photo->getMimeType(),
+        ]);
     }
 
     public function updatedNationalId()
     {
-        $this->validateOnly('national_id');
-        $this->id_preview = $this->national_id->temporaryUrl();
+        try {
+            $this->validateOnly('national_id');
+            $this->id_preview = $this->national_id->temporaryUrl();
+
+            \Log::info('National ID uploaded successfully', [
+                'size' => $this->national_id->getSize(),
+                'mime' => $this->national_id->getMimeType(),
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('National ID upload failed: ' . $e->getMessage());
+            session()->flash('error', 'National ID upload failed: ' . $e->getMessage());
+        }
     }
 
     public function updatedWaecCertificate()
     {
-        $this->validateOnly('waec_certificate');
-        $this->cert_preview = $this->waec_certificate->temporaryUrl();
+        try {
+            $this->validateOnly('waec_certificate');
+            $this->cert_preview = $this->waec_certificate->temporaryUrl();
+
+            \Log::info('WAEC certificate uploaded successfully', [
+                'size' => $this->waec_certificate->getSize(),
+                'mime' => $this->waec_certificate->getMimeType(),
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('WAEC certificate upload failed: ' . $e->getMessage());
+            session()->flash('error', 'WAEC certificate upload failed: ' . $e->getMessage());
+        }
     }
 
     // Go to next step

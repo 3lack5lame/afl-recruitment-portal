@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -16,6 +17,24 @@ Route::middleware([
     })->name('dashboard');
 
     Route::get('/apply', \App\Livewire\RecruitmentForm::class)->name('apply');
+
+    Route::get('/test-upload', function () {
+        return view('test-upload');
+    });
+
+    Route::post('/test-upload', function (Request $request) {
+        $request->validate([
+            'file' => 'required|file|max:5120|mimes:jpg,jpeg,png'
+        ]);
+
+        $path = $request->file('file')->store('test-uploads', 'public');
+
+        return response()->json([
+            'success' => true,
+            'path' => $path,
+            'size' => $request->file('file')->getSize()
+        ]);
+    });
 });
 Route::get('/test-login', function() {
     $credentials = ['email' => 'admin@afl.gov.lr', 'password' => 'password123'];
