@@ -24,6 +24,10 @@ class AppServiceProvider extends ServiceProvider
             URL::forceRootUrl(config('app.url'));
         }
 
+        if (str_contains(request()->getHost(), '.app.github.dev')) {
+            URL::forceScheme('https');
+        }
+
         if (str_starts_with(config('app.url'), 'https://')) {
             URL::forceScheme('https');
         }

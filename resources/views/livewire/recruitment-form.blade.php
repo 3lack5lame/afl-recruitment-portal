@@ -7,13 +7,20 @@
         </div>
     @endif
 
+    @error('form')
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <strong class="font-bold">Error:</strong>
+            <span class="block sm:inline">{{ $message }}</span>
+        </div>
+    @enderror
+
     <!-- Progress Bar -->
     <div class="mb-8">
         <div class="flex justify-between mb-2">
-            <span class="text-sm font-medium" :class="{'text-blue-600': currentStep >= 1}">Step 1: Personal</span>
-            <span class="text-sm font-medium" :class="{'text-blue-600': currentStep >= 2}">Step 2: Contact</span>
-            <span class="text-sm font-medium" :class="{'text-blue-600': currentStep >= 3}">Step 3: Documents</span>
-            <span class="text-sm font-medium" :class="{'text-blue-600': currentStep >= 4}">Step 4: Review</span>
+            <span @class(['text-sm', 'font-medium', 'text-blue-600' => $currentStep >= 1])>Step 1: Personal</span>
+            <span @class(['text-sm', 'font-medium', 'text-blue-600' => $currentStep >= 2])>Step 2: Contact</span>
+            <span @class(['text-sm', 'font-medium', 'text-blue-600' => $currentStep >= 3])>Step 3: Documents</span>
+            <span @class(['text-sm', 'font-medium', 'text-blue-600' => $currentStep >= 4])>Step 4: Review</span>
         </div>
         <div class="w-full bg-gray-200 rounded-full h-2.5">
             <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
